@@ -1,0 +1,23 @@
+import '../model/estacion.dart';
+import '../model/estado_estacion.dart';
+import 'api_estaciones.dart';
+
+class RepositorioEstaciones {
+  final ApiEstaciones api;
+
+  RepositorioEstaciones(this.api);
+
+  Future<List<Estacion>> cargarEstaciones() async {
+    final lista = await api.obtenerInformacion();
+    return lista
+        .map((e) => Estacion.desdeJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<List<EstadoEstacion>> cargarEstados() async {
+    final lista = await api.obtenerEstado();
+    return lista
+        .map((e) => EstadoEstacion.desdeJson(e as Map<String, dynamic>))
+        .toList();
+  }
+}
