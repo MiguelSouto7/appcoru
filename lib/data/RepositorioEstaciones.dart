@@ -1,6 +1,6 @@
 import '../model/estacion.dart';
-import '../model/estado_estacion.dart';
-import 'api_estaciones.dart';
+import '../model/EstadoEstacion.dart';
+import 'ApiEstaciones.dart';
 
 class RepositorioEstaciones {
   final ApiEstaciones api;
@@ -17,7 +17,7 @@ class RepositorioEstaciones {
   Future<List<EstadoEstacion>> cargarEstados() async {
     final lista = await api.obtenerEstado();
     return lista
-        .map((e) => EstadoEstacion.desdeJson(e as Map<String, dynamic>))
+        .map((e) => EstadoEstacion.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 }

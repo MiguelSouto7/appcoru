@@ -1,11 +1,11 @@
-class StationStatus {
+class EstadoEstacion {
   final String stationId;
   final int numBikesAvailable;
   final int numEbikesAvailable;
   final int numDocksAvailable;
   final DateTime lastUpdated;
 
-  StationStatus({
+  EstadoEstacion({
     required this.stationId,
     required this.numBikesAvailable,
     required this.numEbikesAvailable,
@@ -13,8 +13,8 @@ class StationStatus {
     required this.lastUpdated,
   });
 
-  factory StationStatus.fromJson(Map<String, dynamic> json) {
-    return StationStatus(
+  factory EstadoEstacion.fromJson(Map<String, dynamic> json) {
+    return EstadoEstacion(
       stationId: json['station_id'] as String,
       numBikesAvailable: (json['num_bikes_available'] ?? 0) as int,
       numEbikesAvailable: (json['num_ebikes_available'] ?? 0) as int,

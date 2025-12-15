@@ -1,28 +1,28 @@
 class Estacion {
-  final String id;
-  final String nombre;
-  final String direccion;
-  final double latitud;
-  final double longitud;
-  final int capacidad;
+  final String stationId;
+  final String name;
+  final String address;
+  final double lat;
+  final double lon;
+  final int capacity;
 
   Estacion({
-    required this.id,
-    required this.nombre,
-    required this.direccion,
-    required this.latitud,
-    required this.longitud,
-    required this.capacidad,
+    required this.stationId,
+    required this.name,
+    required this.address,
+    required this.lat,
+    required this.lon,
+    required this.capacity,
   });
 
-  factory Estacion.desdeJson(Map<String, dynamic> json) {
+  factory Estacion.fromJson(Map<String, dynamic> json) {
     return Estacion(
-      id: json['station_id'] as String,
-      nombre: (json['name'] ?? '') as String,
-      direccion: (json['address'] ?? '') as String,
-      latitud: (json['lat'] as num).toDouble(),
-      longitud: (json['lon'] as num).toDouble(),
-      capacidad: (json['capacity'] ?? 0) as int,
+      stationId: json['station_id'] as String,
+      name: (json['name'] ?? '') as String,
+      address: (json['address'] ?? '') as String,
+      lat: (json['lat'] as num).toDouble(),
+      lon: (json['lon'] as num).toDouble(),
+      capacity: (json['capacity'] ?? 0) as int,
     );
   }
 }
