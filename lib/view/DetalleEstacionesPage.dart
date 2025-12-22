@@ -4,6 +4,10 @@ import 'package:appcoru/viewmodel/InformeEstacionesVm.dart';
 import 'package:appcoru/model/Estacion.dart';
 import 'package:appcoru/model/EstadoEstacion.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:pdf/pdf.dart'; // Núcleo de pdf
+import 'package:pdf/widgets.dart'
+    as pw; // Widgets de pdf (alias 'pw' para evitar conflictos con Flutter)
+import 'package:printing/printing.dart'; // Para imprimir y compartir PDFs
 
 class DetalleEstacionPage extends StatelessWidget {
   final Estacion estacion;
@@ -15,21 +19,29 @@ class DetalleEstacionPage extends StatelessWidget {
     final vm = context.watch<InformeEstacionesVm>();
     final EstadoEstacion estado = vm.estadoDeEstacion(estacion.stationId);
 
-    // Calcular los valores para el gráfico
     final int bicisMecanicas = estado.numBikesAvailable;
     final int eBikes = estado.numEbikesAvailable;
     final int anclajesLibres = estado.numDocksAvailable;
     final int total = bicisMecanicas + eBikes + anclajesLibres;
 
     return Scaffold(
-      appBar: AppBar(title: Text(estacion.name)),
+      appBar: AppBar(
+        title: Text(estacion.name),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf),
+            onPressed: () {
+              _generarPdf(context, estacion, estado);
+            },
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // --- Información estática ---
               Text(
                 'Dirección: ${estacion.address}',
                 style: const TextStyle(fontSize: 16),
@@ -46,7 +58,6 @@ class DetalleEstacionPage extends StatelessWidget {
               ),
               const Divider(height: 32),
 
-              // --- Estado actual ---
               Text(
                 'Bicis mecánicas: $bicisMecanicas',
                 style: const TextStyle(fontSize: 16),
@@ -63,8 +74,6 @@ class DetalleEstacionPage extends StatelessWidget {
               ),
 
               const SizedBox(height: 24),
-
-              // ========== PIE CHART: DISTRIBUCIÓN DE LA ESTACIÓN ==========
               const Text(
                 'Distribución actual:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -113,11 +122,130 @@ class DetalleEstacionPage extends StatelessWidget {
                     ),
                   ),
                 ),
-              // ========== FIN DEL PIE CHART ==========
             ],
           ),
         ),
       ),
     );
+  }
+
+  // ========== FUNCIÓN DE EXPORTACIÓN A PDF ==========
+  void _generarPdf(
+    BuildContext context,
+    Estacion estacion,
+    EstadoEstacion estado,
+  ) async {
+    final pdf = pw.Document();
+
+    String recomendacion;
+    if (estado.numBikesAvailable > 0 || estado.numEbikesAvailable > 0) {
+      recomendacion = "SÍ";
+    } else if (estado.numDocksAvailable > 0) {
+      recomendacion = "QUIZÁ";
+    } else {
+      recomendacion = "NO";
+    }
+
+    final fechaGeneracion = DateTime.now();
+
+    pdf.addPage(
+      pw.Page(
+        margin: pw.EdgeInsets.all(32),
+        build: (pw.Context context) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text(
+              'Informe de Estación',
+              style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.SizedBox(height: 12),
+
+            pw.Text(
+              'Datos estáticos:',
+              style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.Text(
+              'Nombre: ${estacion.name}',
+              style: pw.TextStyle(fontSize: 16),
+            ),
+            pw.Text(
+              'Dirección: ${estacion.address}',
+              style: pw.TextStyle(fontSize: 16),
+            ),
+            pw.Text(
+              'Capacidad total: ${estacion.capacity}',
+              style: pw.TextStyle(fontSize: 16),
+            ),
+            pw.SizedBox(height: 16),
+
+            pw.Text(
+              'Estado actual:',
+              style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.Text(
+              'Bicis mecánicas disponibles: ${estado.numBikesAvailable}',
+              style: pw.TextStyle(fontSize: 16),
+            ),
+            pw.Text(
+              'E-bikes disponibles: ${estado.numEbikesAvailable}',
+              style: pw.TextStyle(fontSize: 16),
+            ),
+            pw.Text(
+              'Anclajes libres: ${estado.numDocksAvailable}',
+              style: pw.TextStyle(fontSize: 16),
+            ),
+            pw.SizedBox(height: 16),
+
+            pw.Text(
+              '¿Me compensa bajar ahora?',
+              style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.Text(
+              recomendacion,
+              style: pw.TextStyle(
+                fontSize: 24,
+                fontWeight: pw.FontWeight.bold,
+                color: _colorRecomendacion(recomendacion),
+              ),
+            ),
+            pw.SizedBox(height: 16),
+
+            pw.Text(
+              'Fechas:',
+              style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.Text(
+              'Generado el: ${_formatoFecha(fechaGeneracion)}',
+              style: pw.TextStyle(fontSize: 14),
+            ),
+            pw.Text(
+              'Datos actualizados el: ${_formatoFecha(estado.lastUpdated)}',
+              style: pw.TextStyle(fontSize: 14),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );
+  }
+
+  PdfColor _colorRecomendacion(String recomendacion) {
+    switch (recomendacion) {
+      case "SÍ":
+        return PdfColors.green;
+      case "QUIZÁ":
+        return PdfColors.orange;
+      case "NO":
+        return PdfColors.red;
+      default:
+        return PdfColors.black;
+    }
+  }
+
+  String _formatoFecha(DateTime fecha) {
+    return '${fecha.day}/${fecha.month}/${fecha.year} ${fecha.hour}:${fecha.minute.toString().padLeft(2, '0')}';
   }
 }
