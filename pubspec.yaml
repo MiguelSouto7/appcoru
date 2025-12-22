@@ -38,7 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   http: ^1.6.0          # Actualizado (compatible con Dart 3.x)
   provider: ^6.1.1  
-  fl_chart: ^1.1.1    # Obligatorio para gráficos
+  fl_chart: ^1.1.1      # Obligatorio para gráficos
   pdf: ^3.10.4          # Para generar PDF
   printing: ^5.11.1     # Para compartir/ver PDF
 
