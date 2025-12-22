@@ -50,10 +50,11 @@ class InformeEstacionesVm extends ChangeNotifier {
     error = null;
     notifyListeners();
 
-    await Future.wait([
-      cargarEstaciones(),
-      cargarEstados(),
-    ]);
+    await Future.wait([cargarEstaciones(), cargarEstados()]);
+
+    // Pintar para depuración
+    print('Estaciones: ${estaciones.length}');
+    print('Estados: ${estados.length}');
 
     cargando = false;
     notifyListeners();
@@ -71,5 +72,32 @@ class InformeEstacionesVm extends ChangeNotifier {
         lastUpdated: DateTime.now(),
       ),
     );
+  }
+
+  // Método que devuelve las 5 estaciones con más e-bikes disponibles.
+  List<MapEntry<Estacion, EstadoEstacion>> get top5EstacionesConMasEbikes {
+    final combinadas = <MapEntry<Estacion, EstadoEstacion>>[];
+
+    for (final estacion in estaciones) {
+      final estado = estados.firstWhere(
+        (e) => e.stationId == estacion.stationId,
+        orElse: () => EstadoEstacion(
+          stationId: estacion.stationId,
+          numBikesAvailable: 0,
+          numEbikesAvailable: 0,
+          numDocksAvailable: 0,
+          lastUpdated: DateTime.now(),
+        ),
+      );
+      combinadas.add(MapEntry(estacion, estado));
+    }
+
+    // Ordenar por e-bikes (aunque sean 0)
+    combinadas.sort(
+      (a, b) =>
+          b.value.numEbikesAvailable.compareTo(a.value.numEbikesAvailable),
+    );
+
+    return combinadas.take(5).toList();
   }
 }

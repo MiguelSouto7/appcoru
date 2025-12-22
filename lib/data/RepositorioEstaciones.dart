@@ -16,6 +16,7 @@ class RepositorioEstaciones {
 
   Future<List<EstadoEstacion>> cargarEstados() async {
     final lista = await api.obtenerEstado();
+    print('Datos de estado recibidos: $lista'); // AÑADIR PARA DEPURACIÓN
     return lista
         .map((e) => EstadoEstacion.fromJson(e as Map<String, dynamic>))
         .toList();
