@@ -46,74 +46,100 @@ class InformeEstacionesPage extends StatelessWidget {
               if (top5.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Container(
-                    height: 300,
-                    color: Colors.grey[100],
-                    child: BarChart(
-                      BarChartData(
-                        // Mostrar el eje Y para ver que los valores son 0
-                        titlesData: FlTitlesData(
-                          show: true, // ← Mostrar títulos del eje Y
-                          bottomTitles: AxisTitles(
-                            sideTitles: SideTitles(
-                              showTitles: true,
-                              getTitlesWidget: (value, meta) {
-                                final estacion = top5[value.toInt()].key;
-                                return Text(
-                                  estacion.name.split(' ').first,
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.black54,
-                                  ),
-                                );
-                              },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Título claro del gráfico
+                      const Text(
+                        'Top 5 estaciones por bicis totales disponibles',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Gráfico de barras
+                      SizedBox(
+                        height: 250,
+                        child: BarChart(
+                          BarChartData(
+                            titlesData: FlTitlesData(
+                              show: true,
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  getTitlesWidget: (value, meta) {
+                                    final index = value.toInt();
+                                    if (index < top5.length) {
+                                      final estacion = top5[index].key;
+                                      return Text(
+                                        estacion.name.split(' ').first,
+                                        style: const TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.black54,
+                                        ),
+                                      );
+                                    }
+                                    return const Text('');
+                                  },
+                                ),
+                              ),
+                              leftTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  getTitlesWidget: (value, meta) {
+                                    return Text(
+                                      value.toInt().toString(),
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.black54,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
                             ),
-                          ),
-                          leftTitles: AxisTitles(
-                            sideTitles: SideTitles(showTitles: true),
+                            gridData: FlGridData(show: true),
+                            borderData: FlBorderData(show: true),
+                            barGroups: top5.asMap().entries.map((entry) {
+                              final index = entry.key;
+                              final estacion = entry.value.key;
+                              final estado = entry.value.value;
+                              final totalBicis =
+                                  estado.numBikesAvailable +
+                                  estado.numEbikesAvailable;
+
+                              return BarChartGroupData(
+                                x: index,
+                                barRods: [
+                                  BarChartRodData(
+                                    toY: totalBicis.toDouble(),
+                                    color: Colors.blue[600],
+                                    width: 30,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ],
+                              );
+                            }).toList(),
+                            groupsSpace: 20,
+                            maxY: _calcularMaxY(top5), // Ajusta dinámicamente
                           ),
                         ),
-                        gridData: FlGridData(
-                          show: true,
-                        ), // ← Mostrar cuadrícula
-                        borderData: FlBorderData(show: true),
-                        barGroups: top5.asMap().entries.map((entry) {
-                          final index = entry.key;
-                          final estado = entry.value.value;
-
-                          return BarChartGroupData(
-                            x: index,
-                            barRods: [
-                              BarChartRodData(
-                                toY: estado.numEbikesAvailable.toDouble(),
-                                color: Colors.blue[600],
-                                width: 30,
-                                // Mostrar el valor encima de la barra (aunque sea 0)
-                                /*   rodStackItems: [
-                                  BarChartRodStackItem(
-                                    0,
-                                    estado.numEbikesAvailable.toDouble()
-                                    /* Text(
-                                      '${estado.numEbikesAvailable}',
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 12,
-                                      ),
-                                    ),*/
-                                  ),
-                                ],*/
-                              ),
-                            ],
-                          );
-                        }).toList(),
-                        groupsSpace: 16,
-                        // Asegurar que el eje Y va desde 0
-                        maxY: 10, // ← Ajusta según tus datos
                       ),
-                    ),
+
+                      // Leyenda explicativa
+                      const SizedBox(height: 8),
+                      Text(
+                        'Bicis totales = mecánicas + eléctricas',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-
               // ========== FIN DEL GRÁFICO ==========
 
               // --- MÉTRICAS GLOBALES ---
@@ -174,5 +200,17 @@ class InformeEstacionesPage extends StatelessWidget {
         },
       ),
     );
+  }
+
+  // ========== FUNCIÓN AUXILIAR PARA CALCULAR EL EJE Y MÁXIMO ==========
+  static double _calcularMaxY(List<MapEntry<Estacion, EstadoEstacion>> top5) {
+    int maxValor = 0;
+    for (final entry in top5) {
+      final total =
+          entry.value.numBikesAvailable + entry.value.numEbikesAvailable;
+      if (total > maxValor) maxValor = total;
+    }
+    // Aseguramos que el eje Y tenga al menos 10 unidades
+    return (maxValor < 10) ? 10.0 : (maxValor + 5).toDouble();
   }
 }

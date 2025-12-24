@@ -17,17 +17,15 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => InformeEstacionesVm(
-            RepositorioEstaciones(ApiEstaciones()),
-          )..refrescar(), // carga inicial
+          create: (_) =>
+              InformeEstacionesVm(RepositorioEstaciones(ApiEstaciones()))
+                ..refrescar(), // carga inicial
         ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Informe Estaciones',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
+        theme: ThemeData(primarySwatch: Colors.blue),
         home: const InformeEstacionesPage(),
       ),
     );

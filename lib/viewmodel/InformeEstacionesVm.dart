@@ -92,11 +92,12 @@ class InformeEstacionesVm extends ChangeNotifier {
       combinadas.add(MapEntry(estacion, estado));
     }
 
-    // Ordenar por e-bikes (aunque sean 0)
-    combinadas.sort(
-      (a, b) =>
-          b.value.numEbikesAvailable.compareTo(a.value.numEbikesAvailable),
-    );
+    // Ordenar por bicis totales (mecánicas + eléctricas)
+    combinadas.sort((a, b) {
+      final totalA = a.value.numBikesAvailable + a.value.numEbikesAvailable;
+      final totalB = b.value.numBikesAvailable + b.value.numEbikesAvailable;
+      return totalB.compareTo(totalA);
+    });
 
     return combinadas.take(5).toList();
   }
