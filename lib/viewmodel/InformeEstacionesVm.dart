@@ -3,18 +3,26 @@ import 'package:appcoru/data/RepositorioEstaciones.dart';
 import 'package:appcoru/model/Estacion.dart';
 import 'package:appcoru/model/EstadoEstacion.dart';
 
+// ViewModel:
+// - Coordina la carga de datos desde el repositorio
+// - Calcula métricas globales
+// - Proporciona métodos para acceder al estado de estaciones individuales
+// - Notifica a la UI cuando hay cambios (ChangeNotifier)
 class InformeEstacionesVm extends ChangeNotifier {
   final RepositorioEstaciones repositorio;
 
+  // Constructor con inyección de dependencias
   InformeEstacionesVm(this.repositorio);
 
+  // Estado de carga y errores
   bool cargando = false;
   String? error;
 
+  // Listas de datos: estaciones -> estáticos y estados -> dinámicos
   List<Estacion> estaciones = <Estacion>[];
   List<EstadoEstacion> estados = <EstadoEstacion>[];
 
-  // --- MÉTRICAS ---
+  // --- MÉTRICAS GLOBALES -> calculadas en tiempo real ---
   int get totalEstaciones => estaciones.length;
   int get totalBicisDisponibles =>
       estados.fold(0, (suma, e) => suma + e.numBikesAvailable);
@@ -23,7 +31,7 @@ class InformeEstacionesVm extends ChangeNotifier {
   int get totalAnclajesLibres =>
       estados.fold(0, (suma, e) => suma + e.numDocksAvailable);
 
-  // --- MÉTODOS DE CARGA ---
+  // --- MÉTODO DE CARGA DE LOS DATOS DE ESTACIONES ---
   Future<void> cargarEstaciones() async {
     try {
       estaciones = (await repositorio.cargarEstaciones()).cast<Estacion>();
@@ -34,6 +42,7 @@ class InformeEstacionesVm extends ChangeNotifier {
     notifyListeners();
   }
 
+  // --- MÉTODO CARGA DE LOS DATOS DINÁMICOS (estados) -> en tiempo real ---
   Future<void> cargarEstados() async {
     try {
       estados = await repositorio.cargarEstados();
@@ -44,15 +53,16 @@ class InformeEstacionesVm extends ChangeNotifier {
     notifyListeners();
   }
 
-  // --- MÉTODO GLOBAL ---
+  // --- MÉTODO GLOBAL (actualiza toda la info)---
   Future<void> refrescar() async {
     cargando = true;
     error = null;
     notifyListeners();
 
+    // Carga estaciones y estados de datos en paralelo
     await Future.wait([cargarEstaciones(), cargarEstados()]);
 
-    // Pintar para depuración
+    // Pintar para depuración(PRUEBA)
     print('Estaciones: ${estaciones.length}');
     print('Estados: ${estados.length}');
 
@@ -61,6 +71,8 @@ class InformeEstacionesVm extends ChangeNotifier {
   }
 
   // --- ESTADO INDIVIDUAL ---
+  // Busca el estado de una estación por su ID
+  // Si no lo encuentra, devuelve un estado vacío para evitar errores
   EstadoEstacion estadoDeEstacion(String id) {
     return estados.firstWhere(
       (e) => e.stationId == id,
@@ -78,6 +90,7 @@ class InformeEstacionesVm extends ChangeNotifier {
   List<MapEntry<Estacion, EstadoEstacion>> get top5EstacionesConMasEbikes {
     final combinadas = <MapEntry<Estacion, EstadoEstacion>>[];
 
+    // Empareja cada estación con su estado actual
     for (final estacion in estaciones) {
       final estado = estados.firstWhere(
         (e) => e.stationId == estacion.stationId,
@@ -99,6 +112,7 @@ class InformeEstacionesVm extends ChangeNotifier {
       return totalB.compareTo(totalA);
     });
 
+    // Devuelvelas 5 primeras
     return combinadas.take(5).toList();
   }
 }

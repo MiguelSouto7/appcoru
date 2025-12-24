@@ -1,3 +1,4 @@
+// Modelo que representa los datos de la estación de BiciCoruña.
 class Estacion {
   final String stationId;
   final String name;
@@ -6,6 +7,7 @@ class Estacion {
   final double lon;
   final int capacity;
 
+  // Constructor: crea una instancia con todos los campos
   Estacion({
     required this.stationId,
     required this.name,
@@ -15,6 +17,8 @@ class Estacion {
     required this.capacity,
   });
 
+  // Factory crea una instancia de Estacion a partir de un Map desde JSON.
+  // Se usa para convertir la respuesta de la API en un objeto Dart tipado.
   factory Estacion.fromJson(Map<String, dynamic> json) {
     return Estacion(
       stationId: json['station_id'] as String,

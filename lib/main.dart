@@ -5,6 +5,9 @@ import 'package:appcoru/data/RepositorioEstaciones.dart';
 import 'package:appcoru/data/ApiEstaciones.dart';
 import 'package:appcoru/view/InformeEstacionPage.dart';
 
+// - Crea la cadena de dependencias: ApiEstaciones → RepositorioEstaciones → InformeEstacionesVm
+// - Inicia la carga automática de datos al abrir la app
+// - Establece la pantalla principal (InformeEstacionesPage)
 void main() {
   runApp(const MyApp());
 }
@@ -16,6 +19,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // Inyección de dependencias en cadena:
+        // ApiEstaciones() → RepositorioEstaciones() → InformeEstacionesVm()
         ChangeNotifierProvider(
           create: (_) =>
               InformeEstacionesVm(RepositorioEstaciones(ApiEstaciones()))

@@ -1,3 +1,4 @@
+// Modelo que representa el ESTADO EN TIEMPO REAL de una estación.
 class EstadoEstacion {
   final String stationId;
   final int numBikesAvailable;
@@ -5,6 +6,7 @@ class EstadoEstacion {
   final int numDocksAvailable;
   final DateTime lastUpdated;
 
+  // Constructor: crea una instancia con todos los campos
   EstadoEstacion({
     required this.stationId,
     required this.numBikesAvailable,
@@ -13,6 +15,7 @@ class EstadoEstacion {
     required this.lastUpdated,
   });
 
+  // Crea una instancia a partir de la respuesta JSON de la API.
   factory EstadoEstacion.fromJson(Map<String, dynamic> json) {
     return EstadoEstacion(
       stationId: json['station_id'] as String,

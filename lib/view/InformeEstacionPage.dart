@@ -6,6 +6,10 @@ import 'package:appcoru/model/EstadoEstacion.dart';
 import 'package:appcoru/view/DetalleEstacionesPage.dart';
 import 'package:fl_chart/fl_chart.dart';
 
+// Pantalla principal que muestra:
+// - Gráfico de barras del top 5 estaciones por bicis totales
+// - Métricas globales (total de estaciones, bicis, e-bikes, anclajes)
+// - Listado completo de estaciones con estado actual
 class InformeEstacionesPage extends StatelessWidget {
   const InformeEstacionesPage({super.key});
 
@@ -33,7 +37,7 @@ class InformeEstacionesPage extends StatelessWidget {
             return Center(child: Text('Error: ${vm.error}'));
           }
 
-          // Obtén el top 5 desde el ViewModel
+          // Obtiene el top 5 desde el ViewModel
           final top5 = vm.top5EstacionesConMasEbikes;
           //-> AÑADIR TEMPORALMENTE
           print('Top 5 estaciones: $top5');
@@ -210,7 +214,7 @@ class InformeEstacionesPage extends StatelessWidget {
           entry.value.numBikesAvailable + entry.value.numEbikesAvailable;
       if (total > maxValor) maxValor = total;
     }
-    // Aseguramos que el eje Y tenga al menos 10 unidades
+    // Asegura que el eje Y tenga al menos 10 unidades
     return (maxValor < 10) ? 10.0 : (maxValor + 5).toDouble();
   }
 }

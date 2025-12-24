@@ -9,6 +9,11 @@ import 'package:pdf/widgets.dart'
     as pw; // Widgets de pdf (alias 'pw' para evitar conflictos con Flutter)
 import 'package:printing/printing.dart'; // Para imprimir y compartir PDFs
 
+// Pantalla de detalle que muestra:
+// - Datos estáticos (nombre, dirección, capacidad)
+// - Estado en tiempo real (bicis, e-bikes, anclajes)
+// - Gráfico circular (PieChart)
+// - Botón para exportar a PDF
 class DetalleEstacionPage extends StatelessWidget {
   final Estacion estacion;
 
@@ -16,9 +21,10 @@ class DetalleEstacionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Obtiene el estado dinámico de la estación desde el ViewModel
     final vm = context.watch<InformeEstacionesVm>();
     final EstadoEstacion estado = vm.estadoDeEstacion(estacion.stationId);
-
+    // Calcula valores para el gráfico
     final int bicisMecanicas = estado.numBikesAvailable;
     final int eBikes = estado.numEbikesAvailable;
     final int anclajesLibres = estado.numDocksAvailable;
@@ -42,6 +48,7 @@ class DetalleEstacionPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // DATOS ESTÁTICOS
               Text(
                 'Dirección: ${estacion.address}',
                 style: const TextStyle(fontSize: 16),
@@ -57,7 +64,7 @@ class DetalleEstacionPage extends StatelessWidget {
                 style: const TextStyle(fontSize: 16),
               ),
               const Divider(height: 32),
-
+              // ESTADO EN TIEMPO REAL
               Text(
                 'Bicis mecánicas: $bicisMecanicas',
                 style: const TextStyle(fontSize: 16),
@@ -72,7 +79,7 @@ class DetalleEstacionPage extends StatelessWidget {
                 'Última actualización: ${estado.lastUpdated}',
                 style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
-
+              // GRÁFICO CIRCULAR (PieChart)
               const SizedBox(height: 24),
               const Text(
                 'Distribución actual:',
@@ -154,12 +161,13 @@ class DetalleEstacionPage extends StatelessWidget {
         build: (pw.Context context) => pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
+            // Encabezado
             pw.Text(
               'Informe de Estación',
               style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
             ),
             pw.SizedBox(height: 12),
-
+            // Datos estáticos
             pw.Text(
               'Datos estáticos:',
               style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
@@ -177,7 +185,7 @@ class DetalleEstacionPage extends StatelessWidget {
               style: pw.TextStyle(fontSize: 16),
             ),
             pw.SizedBox(height: 16),
-
+            // Estado actual
             pw.Text(
               'Estado actual:',
               style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
@@ -195,7 +203,7 @@ class DetalleEstacionPage extends StatelessWidget {
               style: pw.TextStyle(fontSize: 16),
             ),
             pw.SizedBox(height: 16),
-
+            //Me compensa bajar ahora con lógica simple
             pw.Text(
               '¿Me compensa bajar ahora?',
               style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
@@ -226,12 +234,13 @@ class DetalleEstacionPage extends StatelessWidget {
         ),
       ),
     );
-
+    // Muestra el PDF en pantalla o prepara para descargar
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async => pdf.save(),
     );
   }
 
+  // Muestra el PDF en pantalla o prepara para descargar
   PdfColor _colorRecomendacion(String recomendacion) {
     switch (recomendacion) {
       case "SÍ":
@@ -245,6 +254,7 @@ class DetalleEstacionPage extends StatelessWidget {
     }
   }
 
+  // Formatea fecha de forma legible
   String _formatoFecha(DateTime fecha) {
     return '${fecha.day}/${fecha.month}/${fecha.year} ${fecha.hour}:${fecha.minute.toString().padLeft(2, '0')}';
   }
