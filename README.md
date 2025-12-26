@@ -13,14 +13,34 @@ Aplicación Flutter que muestra información en tiempo real del sistema de bicic
 
 ## Capturas
 
-### Pantalla principal - Informe global
-![Pantalla principal con gráfico de barras y métricas](capturas/pantalla_principal.png)
+### Arquitectura MVVM: Separación de responsabilidades 
+## El modelo define la estructura de los datos sin lógica de negocio
+![(model)Estructura de los datos](capturas/Estacion.png)
 
-### Pantalla de detalle - Distribución por estación
-![Pantalla de detalle con gráfico circular](capturas/pantalla_detalle.png)
+### Conexión con la API GBFS: Datos en tiempo real
+## El ViewModel gestiona la comunicación con la API y calcula las métricas globales
+![(viewmodel)Gestion de carga desde la API](capturas/InformeEstacionesVm.png)
 
-### PDF generado - Informe completo
-![PDF generado con recomendación práctica](capturas/pdf_ejemplo.png)
+### Experiencia de usuario visualización intuitiva
+## Pantalla principal: La interfaz muestra la información de forma visual y accesible
+![(view)muestra los datos mediante gráfico](capturas/InformeEstacionesPage.png)
+
+### Conexión con la API de BiciCoruña
+## Mediante de los endpoints se obtienen los datos en tiempo real
+![(data)conexión con la API GBFS](capturas/ApiEstaciones.png)
+
+### Experiencia de usuario
+## Gráfico de barras
+![muetra 5 estaciones con las bicis totales](capturas/GraficoDeBarras.png)
+
+### Gráfico circular
+![muestra número de bicis y anclajes](capturas/GraficoCircular.png)
+
+### PDF con el informe
+![muestra los datos a imprimir](capturas/PDFInforme.png)
+
+### Vista general de la App
+![muestra gráfico, datos bicis, estaciones](capturas/vistaGeneralApp.png)
 
 ## Gráficas elegidas
 
@@ -40,3 +60,4 @@ El gráfico circular muestra cómo está repartida en este momento una estación
 - provider: ^6.1.2 - Gestión de estado con patrón MVVM
 
 ## Ejemplo PDF
+![ejemplo PDF informe](pdf/ejemploPDFInforme.pdf)

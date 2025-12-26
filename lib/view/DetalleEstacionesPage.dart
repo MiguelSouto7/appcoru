@@ -76,7 +76,7 @@ class DetalleEstacionPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Última actualización: ${estado.lastUpdated}',
+                'Última actualización: ${_formatoFechaSinMilisegundos(estado.lastUpdated)}',
                 style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
               // GRÁFICO CIRCULAR (PieChart)
@@ -169,7 +169,7 @@ class DetalleEstacionPage extends StatelessWidget {
             pw.SizedBox(height: 12),
             // Datos estáticos
             pw.Text(
-              'Datos estáticos:',
+              'Estación:',
               style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
             ),
             pw.Text(
@@ -256,6 +256,10 @@ class DetalleEstacionPage extends StatelessWidget {
 
   // Formatea fecha de forma legible
   String _formatoFecha(DateTime fecha) {
+    return '${fecha.day}/${fecha.month}/${fecha.year} ${fecha.hour}:${fecha.minute.toString().padLeft(2, '0')}';
+  }
+
+  String _formatoFechaSinMilisegundos(DateTime fecha) {
     return '${fecha.day}/${fecha.month}/${fecha.year} ${fecha.hour}:${fecha.minute.toString().padLeft(2, '0')}';
   }
 }
